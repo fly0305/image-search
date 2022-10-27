@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Image Search</title>
+
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" href="favicon.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      href="http://fonts.googleapis.com/css?family=Alfa+Slab+One"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="container">
+    <header class="head">
+      <h1 class="center">
+        <h2>3X <span class="color-red">CONTENT</span></h2>
+      </h1>
+    </header>
+
+    <section class="sub-title">
+      <i class="fa fa-brands fa-twitch color-twitch mr-10"></i>
+      <h2>Twitch Clips Compilation</h2>
+    </section>
+
+    <section class="section-body">
+      <h2>Search Image</h2>
+      <div class="search">
+        <input
+          id="search-keyword"
+          type="text"
+          name="search-keyword"
+          placeholder="Search"
+          required
+        />
+        <button class="search-button" type="submit">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
+      <h2>Select Clips</h2>
+
+      <div class="avatar-container">
+        <img
+          src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMzEzMjh8MHwxfHNlYXJjaHwxfHxjYXR8ZW58MHx8fHwxNjY2OTAxOTg4&ixlib=rb-4.0.3&q=80&w=400"
+          alt="Avatar"
+          class="avatar"
+        />
+        <div class="avatar-description">
+          <p class="avatar-name">
+            TenZ <i class="fa fa-check-circle color-twitch mr-10"></i>
+          </p>
+          <p class="followers">3.1M followers</p>
+        </div>
+      </div>
+      <div class="site-container">
+        <div id="response-container"></div>
+      </div>
+
+      <div class="mt-30">
+        <span class="heading mr-7">Add Intro</span>
+        <input type="file" />
+      </div>
+
+      <div class="mt-30">
+        <span class="heading">Add Outro</span>
+        <input type="file" />
+      </div>
+
+      <div class="mt-30">
+        <span class="heading">Add Transitions between clips</span>
+        <input type="file" />
+      </div>
+
+      <button class="jelly-button mt-30">Create</button>
+    </section>
+
+    <script>
+      document.querySelector(".search-button").addEventListener("click", req);
+
+      document
+        .querySelector("#search-keyword")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            req();
+          }
+        });
+
+      const responseContainer = document.querySelector("#response-container");
+
+      let searchedForText;
+
+      let unsplashRequest = new XMLHttpRequest();
+
+      function req() {
+        searchedForText = document.querySelector("#search-keyword").value;
+        unsplashRequest.open(
+          "GET",
+          `https://api.unsplash.com/search/photos?per_page=50&query=${searchedForText}`
+        );
+        unsplashRequest.onload = addImage;
+        unsplashRequest.onerror = error;
+        unsplashRequest.setRequestHeader(
+          "Authorization",
+          "Client-ID iUo0rk3sBOmMRMExqB0U5rMfS8s7Bp31ykYYYHkcTlw"
+        );
+        unsplashRequest.send();
+      }
+
+      function addImage() {
+        var rp = JSON.parse(unsplashRequest.response);
+        if (rp.results.length > 0) {
+          if (rp.results.length > 30) {
+            rp.results.length = 30;
+          }
+          responseContainer.innerHTML = "";
+          for (result of rp.results) {
+            responseContainer.innerHTML += `
+              <img src='${result.urls.small}' alt='${searchedForText}' class='image'>
+              `;
+          }
+        } else {
+          responseContainer.innerHTML = "<h2>No results </h2>";
+        }
+      }
+
+      function error() {
+        responseContainer.innerHTML =
+          "<h2>Sorry Limit Reached For This Hour<br/> Try Next Hour  </h2>";
+      }
+    </script>
+  </body>
+</html>
